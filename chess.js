@@ -35,26 +35,32 @@ var FigureView = Backbone.View.extend({
 
 });
 
+var Figures = Backbone.Collection.extend({
+
+    model: Figure
+
+});
+
 $(function() {
-    var figures = [];
+    var figures = new Figures();
 
     var colors = ['black', 'white'];
     var rows = [0, 7];
 
     for(var c = 0; c < 2; c++) {
         for (var i = 0; i < 8; i++) {
-            figures = figures.concat(new Figure({name: 'pawn', text: '♟', color: colors[c], row: c == 0 ? 1 : 6, col: i}));
+            figures.add({name: 'pawn', text: '♟', color: colors[c], row: c == 0 ? 1 : 6, col: i});
         }
 
-        figures = figures.concat([
-            new Figure({name: 'rook', text: '♜', color: colors[c], row: rows[c], col: 0}),
-            new Figure({name: 'knight', text: '♞', color: colors[c], row: rows[c], col: 1}),
-            new Figure({name: 'bishop', text: '♝', color: colors[c], row: rows[c], col: 2}),
-            new Figure({name: 'rook', text: '♜', color: colors[c], row: rows[c], col: 7}),
-            new Figure({name: 'knight', text: '♞', color: colors[c], row: rows[c], col: 6}),
-            new Figure({name: 'bishop', text: '♝', color: colors[c], row: rows[c], col: 5}),
-            new Figure({name: 'king', text: '♚', color: colors[c], row: rows[c], col: c == 0 ? 3 : 4}),
-            new Figure({name: 'queen', text: '♛', color: colors[c], row: rows[c], col: c == 0 ? 4 : 3}),
+        figures.add([
+            {name: 'rook', text: '♜', color: colors[c], row: rows[c], col: 0},
+            {name: 'knight', text: '♞', color: colors[c], row: rows[c], col: 1},
+            {name: 'bishop', text: '♝', color: colors[c], row: rows[c], col: 2},
+            {name: 'rook', text: '♜', color: colors[c], row: rows[c], col: 7},
+            {name: 'knight', text: '♞', color: colors[c], row: rows[c], col: 6},
+            {name: 'bishop', text: '♝', color: colors[c], row: rows[c], col: 5},
+            {name: 'king', text: '♚', color: colors[c], row: rows[c], col: c == 0 ? 3 : 4},
+            {name: 'queen', text: '♛', color: colors[c], row: rows[c], col: c == 0 ? 4 : 3},
         ]);
     }
 
@@ -63,7 +69,7 @@ $(function() {
         var tr = $("<tr>");
         for(var j = 0; j < 8; j++) {
             var td = $("<td>");
-            var f = _.find(figures, function(f) {
+            var f = figures.find(function(f) {
                 return f.get('row') == i && f.get('col') == j;
             });
             if(f) {
@@ -87,16 +93,14 @@ $(function() {
             $(this).append(el);
 
             var cid = el.attr('cid');
-            var f = _.find(figures, function(f) {
-                return f.cid == cid;
-            });
+            var f = figures.get(cid);
             f.set({col: $(this).attr('col'), row: $(this).attr('row')});
 
             el.css({left: 0, top: 0});
         }
     });
 
-    _.each(figures, function(f) {
+    figures.each(function(f) {
         f.on("change:col change:row", function(model, data) {
             console.log(f.cid, data)
         });
