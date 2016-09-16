@@ -2,7 +2,7 @@
  * Created by demon on 12.09.16.
  */
 
-var Figure = _.extend(Backbone.Model, {
+var Figure = Backbone.Model.extend({
 
     defaults: {
         name: '',
@@ -14,6 +14,23 @@ var Figure = _.extend(Backbone.Model, {
 
     constructor: function () {
         Backbone.Model.apply(this, arguments);
+    }
+
+});
+
+var FigureView = Backbone.View.extend({
+
+    className: "figure",
+
+    render: function() {
+        $(this.el).text(this.model.get('text'));
+
+        $(this.el).addClass(this.model.get('color'));
+        $(this.el).attr({cid: this.model.cid});
+
+        $(this.el).draggable();
+
+        return this;
     }
 
 });
@@ -46,17 +63,13 @@ $(function() {
         var tr = $("<tr>");
         for(var j = 0; j < 8; j++) {
             var td = $("<td>");
-            var div = $("<div>");
             var f = _.find(figures, function(f) {
                 return f.get('row') == i && f.get('col') == j;
             });
             if(f) {
-                div.text(f.get('text'));
-                div.addClass(f.get('color'));
-                div.addClass("figure");
-                div.attr({cid: f.cid});
-                $(div).draggable();
-                td.html(div);
+                var v = new FigureView({model: f});
+
+                td.html(v.render().el);
             }
             td.attr({row: i, col: j});
             tr.append(td);
