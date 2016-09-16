@@ -66,6 +66,10 @@ $(function() {
         figure.on("change:col change:row", function(model, data) {
             console.log(figure.cid, data)
         });
+
+        figure.on("remove", function() {
+            v.remove();
+        });
     });
 
     $("#board td").droppable({
@@ -75,6 +79,14 @@ $(function() {
 
             el.detach();
             $(this).append(el);
+
+            var f_old = figures.find(function(f) {
+                return f.get('row') == $(this).attr('row') && f.get('col') == $(this).attr('col');
+            }.bind(this));
+
+            if(f_old) {
+                figures.remove(f_old);
+            }
 
             var cid = el.attr('cid');
             var f = figures.get(cid);
