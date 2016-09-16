@@ -12,3 +12,20 @@
 #board tr:nth-child(even) td:nth-child(even) {
     background-color: black;
 }
+
+#board div {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+#board div.black {
+    color: green;
+}
+
+#board div.white {
+    color: gray;
+}
