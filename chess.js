@@ -37,6 +37,8 @@ $(function() {
             if(f) {
                 div.text(f.text);
                 div.addClass(f.color);
+                div.addClass("figure");
+                $(div).draggable();
                 td.html(div);
             }
             tr.append(td);
@@ -44,4 +46,16 @@ $(function() {
         board.append(tr);
     }
     $("#board").html(board);
+
+    $("#board td").droppable({
+        accept: '.figure',
+        drop: function(event, ui) {
+            var el = $(ui.helper[0]);
+
+            el.detach();
+            $(this).append(el);
+
+            el.css({left: 0, top: 0});
+        }
+    });
 });
