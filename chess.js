@@ -1,6 +1,11 @@
-/**
- * Created by demon on 12.09.16.
- */
+var $ = require('jquery');
+var _ = require('underscore');
+var Backbone = require('backbone');
+
+require('jquery-ui/ui/widgets/draggable.js');
+require('jquery-ui/ui/widgets/droppable.js');
+
+require('./chess.css');
 
 var Figure = Backbone.Model.extend({
 

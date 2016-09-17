@@ -1,0 +1,31 @@
+{
+  "name": "chess_js",
+  "version": "1.0.0",
+  "description": "* Вывести все фигуры (использовать циклы) * Настроить отображение фигур (выравнивание, цвет, размер)",
+  "main": "chess.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dem0n3D/chess_14KB.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dem0n3D/chess_14KB/issues"
+  },
+  "homepage": "https://github.com/Dem0n3D/chess_14KB#readme",
+  "dependencies": {
+    "backbone": "^1.3.3",
+    "jquery": "^3.1.0",
+    "jquery-ui": "^1.12.1",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "css-loader": "^0.25.0",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.2"
+  }
+}
