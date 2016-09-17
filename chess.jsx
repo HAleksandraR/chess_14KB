@@ -1,6 +1,8 @@
 var $ = require('jquery');
 var _ = require('underscore');
 var Backbone = require('backbone');
+var React = require('react');
+var ReactDOM = require('react-dom');
 
 require('jquery-ui/ui/widgets/draggable.js');
 require('jquery-ui/ui/widgets/droppable.js');
@@ -23,9 +25,7 @@ var Figure = Backbone.Model.extend({
 
 });
 
-var FigureView = Backbone.View.extend({
-
-    className: "figure",
+/*var FigureView = React.createComponent({
 
     render: function() {
         $(this.el).text(this.model.get('text'));
@@ -38,7 +38,51 @@ var FigureView = Backbone.View.extend({
         return this;
     }
 
-});
+});*/
+
+class FigureView extends React.Component {
+
+    constructor(props) {
+        super(props);
+
+    }
+
+    render() {
+        return <div className={"figure " + this.props.figure.get('color')}>{this.props.figure.get('text')}</div>;
+    }
+
+}
+
+class BoardView extends React.Component {
+
+    constructor(props) {
+        super(props);
+
+    }
+
+    render() {
+        var rows = [];
+        for(var i = 0; i < 8; i++) {
+            var cols = [];
+            for(var j = 0; j < 8; j++) {
+                var f = this.props.figures.find(function(f) {
+                    return f.get('row') == i && f.get('col') == j;
+                });
+                cols.push(<td key={j}>{f ? <FigureView figure={f} /> : null}</td>);
+            }
+            rows.push(<tr key={i}>{cols}</tr>);
+        }
+
+        return (
+            <table>
+                <tbody>
+                {rows}
+                </tbody>
+            </table>
+        )
+    }
+
+}
 
 var Figures = Backbone.Collection.extend({
 
@@ -49,7 +93,7 @@ var Figures = Backbone.Collection.extend({
 $(function() {
     var figures = new Figures();
 
-    var board = $("<table>");
+    /*var board = $("<table>");
     for(var i = 0; i < 8; i++) {
         var tr = $("<tr>");
         for(var j = 0; j < 8; j++) {
@@ -99,7 +143,7 @@ $(function() {
 
             el.css({left: 0, top: 0});
         }
-    });
+    });*/
 
     /////////////////////////////////
 
@@ -122,4 +166,9 @@ $(function() {
             {name: 'queen', text: '♛', color: colors[c], row: rows[c], col: c == 0 ? 4 : 3},
         ]);
     }
+
+    ReactDOM.render(
+        <BoardView figures={figures} />,
+        $("#board")[0]
+    );
 });

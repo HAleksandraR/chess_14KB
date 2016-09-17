@@ -9,7 +9,7 @@ module.exports = {
 
     entry: {
         chess: [
-            './chess.js'
+            './chess.jsx'
         ]
     },
 
