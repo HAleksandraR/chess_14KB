@@ -16,7 +16,8 @@ var Figure = Backbone.Model.extend({
         text: '',
         color: '',
         row: 0,
-        col: 0
+        col: 0,
+        deleted: false
     },
 
     constructor: function () {
@@ -73,11 +74,11 @@ class BoardCell extends React.Component {
                 var el = $(ui.helper[0]);
 
                 var f_old = figures.find(function(f) {
-                    return f.get('row') == this.props.row && f.get('col') == this.props.col;
+                    return f.get('row') == this.props.row && f.get('col') == this.props.col && !f.get('deleted');
                 }.bind(this));
 
                 if(f_old) {
-                    figures.remove(f_old);
+                    f_old.set({deleted: true});
                 }
 
                 var cid = el.data('cid');
@@ -125,9 +126,10 @@ class BoardView extends React.Component {
             m.push(new Array(8));
         }
 
-        this.props.figures.each(f => {
+        _.each(this.props.figures.filter(f => !f.get('deleted')), f => {
             m[f.get('row')][f.get('col')] = f;
         });
+
         return m;
     }
 
@@ -153,9 +155,38 @@ class BoardView extends React.Component {
 
 }
 
+class KilledFigures extends React.Component {
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            figures: []
+        };
+    }
+
+    componentDidMount() {
+        this.props.figures.on('change', () => {
+            this.setState({
+                figures: this.props.figures.filter(f => f.get('deleted'))
+            });
+        });
+    }
+
+    render() {
+        return (
+            <ul>
+                {_.map(this.state.figures, f => <li key={f.cid}><div className={f.get('color')}>{f.get('text')}</div></li>)}
+            </ul>
+        );
+    }
+}
+
+const AppView = (props) => <div><BoardView figures={props.figures} /><KilledFigures figures={props.figures} /></div>;
+
 $(function() {
     ReactDOM.render(
-        <BoardView figures={figures} />,
+        <AppView figures={figures} />,
         $("#board")[0]
     );
 });
