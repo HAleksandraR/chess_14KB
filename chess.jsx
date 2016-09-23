@@ -25,32 +25,71 @@ var Figure = Backbone.Model.extend({
 
 });
 
-/*var FigureView = React.createComponent({
+var Figures = Backbone.Collection.extend({
 
-    render: function() {
-        $(this.el).text(this.model.get('text'));
+    model: Figure
 
-        $(this.el).addClass(this.model.get('color'));
-        $(this.el).attr({cid: this.model.cid});
+});
 
-        $(this.el).draggable();
+var figures = new Figures();
 
-        return this;
+var colors = ['black', 'white'];
+var rows = [0, 7];
+
+for(var c = 0; c < 2; c++) {
+    for (var i = 0; i < 8; i++) {
+        figures.add({name: 'pawn', text: '♟', color: colors[c], row: c == 0 ? 1 : 6, col: i});
     }
 
-});*/
+    figures.add([
+        {name: 'rook', text: '♜', color: colors[c], row: rows[c], col: 0},
+        {name: 'knight', text: '♞', color: colors[c], row: rows[c], col: 1},
+        {name: 'bishop', text: '♝', color: colors[c], row: rows[c], col: 2},
+        {name: 'rook', text: '♜', color: colors[c], row: rows[c], col: 7},
+        {name: 'knight', text: '♞', color: colors[c], row: rows[c], col: 6},
+        {name: 'bishop', text: '♝', color: colors[c], row: rows[c], col: 5},
+        {name: 'king', text: '♚', color: colors[c], row: rows[c], col: c == 0 ? 3 : 4},
+        {name: 'queen', text: '♛', color: colors[c], row: rows[c], col: c == 0 ? 4 : 3},
+    ]);
+}
 
 class FigureView extends React.Component {
 
-    constructor(props) {
-        super(props);
-
+    componentDidMount() {
+        $(this.refs.figure).draggable();
     }
 
     render() {
-        return <div className={"figure " + this.props.figure.get('color')}>{this.props.figure.get('text')}</div>;
+        return <div ref="figure" className={"figure " + this.props.figure.get('color')} data-cid={this.props.figure.cid}>{this.props.figure.get('text')}</div>;
+    }
+}
+
+class BoardCell extends React.Component {
+
+    componentDidMount() {
+        $(this.refs.cell).droppable({
+            accept: '.figure',
+            drop: (event, ui) => {
+                var el = $(ui.helper[0]);
+
+                var f_old = figures.find(function(f) {
+                    return f.get('row') == this.props.row && f.get('col') == this.props.col;
+                }.bind(this));
+
+                if(f_old) {
+                    figures.remove(f_old);
+                }
+
+                var cid = el.data('cid');
+                var f = figures.get(cid);
+                f.set({col: this.props.col, row: this.props.row});
+            }
+        });
     }
 
+    render() {
+        return <td ref="cell">{this.props.children}</td>;
+    }
 }
 
 class BoardView extends React.Component {
@@ -58,6 +97,38 @@ class BoardView extends React.Component {
     constructor(props) {
         super(props);
 
+        this.toMatrix = this.toMatrix.bind(this);
+
+        this.state = {
+            figures: this.toMatrix()
+        };
+    }
+
+    static get defaultProps() {
+        return {
+            figures: null
+        }
+    }
+
+    componentDidMount() {
+        this.props.figures.on('change', () => {
+            this.setState({
+                figures: this.toMatrix()
+            });
+        });
+    }
+
+    toMatrix() {
+        var m = [];
+
+        for (var i = 0; i < 8; i++) {
+            m.push(new Array(8));
+        }
+
+        this.props.figures.each(f => {
+            m[f.get('row')][f.get('col')] = f;
+        });
+        return m;
     }
 
     render() {
@@ -65,10 +136,8 @@ class BoardView extends React.Component {
         for(var i = 0; i < 8; i++) {
             var cols = [];
             for(var j = 0; j < 8; j++) {
-                var f = this.props.figures.find(function(f) {
-                    return f.get('row') == i && f.get('col') == j;
-                });
-                cols.push(<td key={j}>{f ? <FigureView figure={f} /> : null}</td>);
+                var f = this.state.figures[i][j];
+                cols.push(<BoardCell key={j} col={j} row={i}>{f ? <FigureView figure={f} /> : null}</BoardCell>);
             }
             rows.push(<tr key={i}>{cols}</tr>);
         }
@@ -84,89 +153,7 @@ class BoardView extends React.Component {
 
 }
 
-var Figures = Backbone.Collection.extend({
-
-    model: Figure
-
-});
-
 $(function() {
-    var figures = new Figures();
-
-    /*var board = $("<table>");
-    for(var i = 0; i < 8; i++) {
-        var tr = $("<tr>");
-        for(var j = 0; j < 8; j++) {
-            var td = $("<td>");
-            var f = figures.find(function(f) {
-                return f.get('row') == i && f.get('col') == j;
-            });
-            td.attr({row: i, col: j});
-            tr.append(td);
-        }
-        board.append(tr);
-    }
-    $("#board").html(board);
-
-    figures.on("add", function(figure) {
-        var v = new FigureView({model: figure});
-        $('#board td[row='+figure.get('row')+'][col='+figure.get('col')+']').html(v.render().el);
-
-        figure.on("change:col change:row", function(model, data) {
-            console.log(figure.cid, data)
-        });
-
-        figure.on("remove", function() {
-            v.remove();
-        });
-    });
-
-    $("#board td").droppable({
-        accept: '.figure',
-        drop: function(event, ui) {
-            var el = $(ui.helper[0]);
-
-            el.detach();
-            $(this).append(el);
-
-            var f_old = figures.find(function(f) {
-                return f.get('row') == $(this).attr('row') && f.get('col') == $(this).attr('col');
-            }.bind(this));
-
-            if(f_old) {
-                figures.remove(f_old);
-            }
-
-            var cid = el.attr('cid');
-            var f = figures.get(cid);
-            f.set({col: $(this).attr('col'), row: $(this).attr('row')});
-
-            el.css({left: 0, top: 0});
-        }
-    });*/
-
-    /////////////////////////////////
-
-    var colors = ['black', 'white'];
-    var rows = [0, 7];
-
-    for(var c = 0; c < 2; c++) {
-        for (var i = 0; i < 8; i++) {
-            figures.add({name: 'pawn', text: '♟', color: colors[c], row: c == 0 ? 1 : 6, col: i});
-        }
-
-        figures.add([
-            {name: 'rook', text: '♜', color: colors[c], row: rows[c], col: 0},
-            {name: 'knight', text: '♞', color: colors[c], row: rows[c], col: 1},
-            {name: 'bishop', text: '♝', color: colors[c], row: rows[c], col: 2},
-            {name: 'rook', text: '♜', color: colors[c], row: rows[c], col: 7},
-            {name: 'knight', text: '♞', color: colors[c], row: rows[c], col: 6},
-            {name: 'bishop', text: '♝', color: colors[c], row: rows[c], col: 5},
-            {name: 'king', text: '♚', color: colors[c], row: rows[c], col: c == 0 ? 3 : 4},
-            {name: 'queen', text: '♛', color: colors[c], row: rows[c], col: c == 0 ? 4 : 3},
-        ]);
-    }
-
     ReactDOM.render(
         <BoardView figures={figures} />,
         $("#board")[0]
