@@ -1,0 +1,84 @@
+﻿<html> 
+</head> 
+	<body>
+    <script>
+    </script>
+	<div id='ch' class="divMain">Chess</div>
+	<script>
+
+		for (i=0; i<8; i++)
+			for (j=0; j<8; j++)
+			{
+				var tempdiv1 = document.createElement('div');
+				tempdiv1.id = "block" + i + j;
+
+				if ((i + j) % 2 == 0)
+			  		tempdiv1.style.background = "#A4A4A4";
+			  	else
+			  		tempdiv1.style.background = "#B40404";
+
+				tempdiv1.style.left = j*100;
+				tempdiv1.className = "div1";
+				tempdiv1.style.top = i*100 ;
+				ch.appendChild(tempdiv1);
+			}
+
+		var colors = ["#000", "#CEF6F5"];
+		var figuresT = ['♜','♞','♝','♛','♚','♝','♞','♜'];
+		for(var c = 0; c < 2; c++)
+	    	for (var i = 0; i < 8; i++)
+		    {
+				document.getElementById("block" + (c == 0 ? 1 : 6) + i).innerHTML = '♟';
+		    	document.getElementById("block" + (c == 0 ? 1 : 6) + i).style.color = colors[c];
+
+				document.getElementById("block" + (c == 0 ? 0 : 7) + i).innerHTML = figuresT[i];
+				document.getElementById("block" + (c == 0 ? 0 : 7) + i).style.color = colors[c];
+			}
+
+
+		function Figure3 (name, text, row, col) {
+			this.name = name; this.text = text;
+			this.row = row;	this.col = col;
+			this.divt = document.createElement('div');
+            this.divt.style.background = "#000"; this.divt.id ="divt111";
+		    this.divt.className = "div1";ch.appendChild(this.divt);
+		}
+
+
+
+
+
+		function Figure(name, text, row, col)
+		{
+			this.name = name; this.text = text;
+			this.row = row; this.col = col; this.divt = document.createElement('div');
+			this.divt.id ="divt1"; this.divt.style.left = 100;
+			this.divt.className = "div1"; this.divt.style.background = "#000";
+
+			ch.appendChild(this.divt);
+
+
+		}
+	</script>
+	<head> 
+	<title>Chess</title>
+
+	<style type="text/css">
+	
+	.div1 {
+     font-size : 95px;  width: 100px;
+     height: 100px; position: absolute;
+	}
+
+	.divMain {
+		margin: 30px;width: 1000px;
+		height: 1000px; position: relative;
+	}
+	</style>
+
+
+</head> 
+
+	</body> 
+</html>
+
